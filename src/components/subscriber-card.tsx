@@ -6,7 +6,6 @@ import { StatusBadge } from './status-badge';
 import { ThemedText } from './themed-text';
 import { useTheme } from '@/hooks/use-theme';
 import { useInbox } from '@/context/inbox-context';
-import { Spacing } from '@/constants/theme';
 import { formatDate, sendEmail } from '@/utils/contact-actions';
 
 interface SubscriberCardProps {
@@ -134,37 +133,37 @@ export function SubscriberCard({ subscriber }: SubscriberCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 14,
-    padding: Spacing.three,
-    marginBottom: Spacing.two,
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 8,
     borderWidth: 1,
   },
   contentRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.two,
+    marginBottom: 6,
   },
   avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: Spacing.two,
+    marginRight: 8,
   },
   details: {
     flex: 1,
-    marginRight: Spacing.two,
+    marginRight: 8,
   },
   email: {
-    fontSize: 14,
+    fontSize: 13,
     marginBottom: 2,
   },
   actionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.two,
-    paddingTop: Spacing.two,
+    gap: 6,
+    paddingTop: 6,
     borderTopWidth: 1,
   },
   actionBtn: {
@@ -172,19 +171,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 7,
-    borderRadius: 8,
+    gap: 5,
+    paddingVertical: 5,
+    borderRadius: 7,
   },
   deleteBtn: {
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionBtnText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
 });

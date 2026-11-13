@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { ContactFilter, ContactsAnalytics } from '@/types';
 import { ThemedText } from './themed-text';
 import { useTheme } from '@/hooks/use-theme';
-import { Spacing } from '@/constants/theme';
 
 interface AnalyticsSummaryProps {
   analytics: ContactsAnalytics;
@@ -117,7 +116,7 @@ export function AnalyticsSummary({ analytics, onFilterPress }: AnalyticsSummaryP
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: Spacing.four,
+    paddingHorizontal: 16,
     marginBottom: 6,
   },
   grid: {
@@ -126,12 +125,12 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 7,
+    borderRadius: 9,
     borderWidth: 1,
     justifyContent: 'space-between',
-    minHeight: 48,
+    minHeight: 44,
   },
   statHeader: {
     flexDirection: 'row',
@@ -140,8 +139,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   statValue: {
-    fontSize: 16,
-    lineHeight: 20,
-    fontWeight: '800',
+    fontSize: 15,
+    lineHeight: 19,
+    fontWeight: '700',
   },
 });

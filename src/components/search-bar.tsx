@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/hooks/use-theme';
-import { Spacing } from '@/constants/theme';
 
 interface SearchBarProps {
   value: string;
@@ -29,7 +28,7 @@ export function SearchBar({
             borderColor: theme.cardBorder,
           },
         ]}>
-        <Ionicons name="search" size={17} color={theme.textSecondary} style={styles.icon} />
+        <Ionicons name="search" size={16} color={theme.textSecondary} style={styles.icon} />
         <TextInput
           value={value}
           onChangeText={onChangeText}
@@ -47,7 +46,7 @@ export function SearchBar({
               onClear?.();
             }}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <Ionicons name="close-circle" size={17} color={theme.textSecondary} />
+            <Ionicons name="close-circle" size={16} color={theme.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
@@ -57,15 +56,15 @@ export function SearchBar({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: Spacing.four,
-    marginBottom: Spacing.two,
+    paddingHorizontal: 16,
+    marginBottom: 6,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
     borderWidth: 1,
   },
   icon: {
@@ -73,7 +72,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     padding: 0,
   },
 });

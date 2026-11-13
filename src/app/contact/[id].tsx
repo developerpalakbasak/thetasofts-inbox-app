@@ -15,7 +15,7 @@ import { useInbox } from '@/context/inbox-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { StatusBadge } from '@/components/status-badge';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import {
   formatFullDateTime,
@@ -205,7 +205,7 @@ export default function ContactDetailsScreen() {
                   type="title"
                   style={{
                     color: !contact.isRead ? theme.primaryText : theme.textSecondary,
-                    fontSize: 22,
+                    fontSize: 18,
                   }}>
                   {getInitials(contact.fullName)}
                 </ThemedText>
@@ -215,7 +215,7 @@ export default function ContactDetailsScreen() {
                 <ThemedText type="subtitle" style={styles.fullName}>
                   {contact.fullName}
                 </ThemedText>
-                <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 13 }}>
+                <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 12 }}>
                   Submitted {formatFullDateTime(contact.createdAt)}
                 </ThemedText>
               </View>
@@ -223,8 +223,8 @@ export default function ContactDetailsScreen() {
 
             {/* Badges */}
             <View style={styles.statusBadgesRow}>
-              <StatusBadge type={contact.isRead ? 'read' : 'unread'} size="md" />
-              <StatusBadge type={contact.isReplyed ? 'replied' : 'not_replied'} size="md" />
+              <StatusBadge type={contact.isRead ? 'read' : 'unread'} size="sm" />
+              <StatusBadge type={contact.isReplyed ? 'replied' : 'not_replied'} size="sm" />
             </View>
           </View>
 
@@ -239,7 +239,7 @@ export default function ContactDetailsScreen() {
             </ThemedText>
             <ThemedText
               type="small"
-              style={{ color: theme.textSecondary, fontSize: 12, marginBottom: Spacing.two }}>
+              style={{ color: theme.textSecondary, fontSize: 11, marginBottom: 8 }}>
               Mark when this inquiry has been reviewed and responded to:
             </ThemedText>
 
@@ -264,17 +264,17 @@ export default function ContactDetailsScreen() {
                   <>
                     <Ionicons
                       name={contact.isRead ? 'checkmark-circle' : 'mail-unread-outline'}
-                      size={18}
+                      size={15}
                       color={contact.isRead ? theme.success : theme.primaryText}
                     />
                     <ThemedText
                       type="smallBold"
                       style={{
                         color: contact.isRead ? theme.text : theme.primaryText,
-                        fontSize: 13,
-                        marginLeft: 6,
+                        fontSize: 12,
+                        marginLeft: 5,
                       }}>
-                      {contact.isRead ? 'Readed ✓' : 'Mark as Readed'}
+                      {contact.isRead ? 'Read ✓' : 'Mark as Read'}
                     </ThemedText>
                   </>
                 )}
@@ -300,17 +300,17 @@ export default function ContactDetailsScreen() {
                   <>
                     <Ionicons
                       name={contact.isReplyed ? 'checkmark-done-circle' : 'paper-plane-outline'}
-                      size={18}
+                      size={15}
                       color={contact.isReplyed ? theme.replied : '#FFFFFF'}
                     />
                     <ThemedText
                       type="smallBold"
                       style={{
                         color: contact.isReplyed ? theme.replied : '#FFFFFF',
-                        fontSize: 13,
-                        marginLeft: 6,
+                        fontSize: 12,
+                        marginLeft: 5,
                       }}>
-                      {contact.isReplyed ? 'Replyed ✓' : 'Mark as Replyed'}
+                      {contact.isReplyed ? 'Replied ✓' : 'Mark as Replied'}
                     </ThemedText>
                   </>
                 )}
@@ -329,7 +329,7 @@ export default function ContactDetailsScreen() {
             </ThemedText>
             <ThemedText
               type="small"
-              style={{ color: theme.textSecondary, fontSize: 12, marginBottom: Spacing.two }}>
+              style={{ color: theme.textSecondary, fontSize: 11, marginBottom: 8 }}>
               Directly reach out to {contact.fullName} from your phone:
             </ThemedText>
 
@@ -341,14 +341,14 @@ export default function ContactDetailsScreen() {
                   style={[styles.channelItem, { backgroundColor: theme.backgroundElement }]}
                   activeOpacity={0.7}>
                   <View style={[styles.channelIconCircle, { backgroundColor: theme.successMuted }]}>
-                    <Ionicons name="call" size={18} color={theme.success} />
+                    <Ionicons name="call" size={15} color={theme.success} />
                   </View>
                   <ThemedText type="smallBold" style={styles.channelLabel}>
                     Call
                   </ThemedText>
                   <ThemedText
                     type="small"
-                    style={{ color: theme.textSecondary, fontSize: 11 }}
+                    style={{ color: theme.textSecondary, fontSize: 10 }}
                     numberOfLines={1}>
                     {contact.phone}
                   </ThemedText>
@@ -367,14 +367,14 @@ export default function ContactDetailsScreen() {
                 style={[styles.channelItem, { backgroundColor: theme.backgroundElement }]}
                 activeOpacity={0.7}>
                 <View style={[styles.channelIconCircle, { backgroundColor: theme.primaryMuted }]}>
-                  <Ionicons name="mail" size={18} color={theme.primary} />
+                  <Ionicons name="mail" size={15} color={theme.primary} />
                 </View>
                 <ThemedText type="smallBold" style={styles.channelLabel}>
                   Email
                 </ThemedText>
                 <ThemedText
                   type="small"
-                  style={{ color: theme.textSecondary, fontSize: 11 }}
+                  style={{ color: theme.textSecondary, fontSize: 10 }}
                   numberOfLines={1}>
                   {contact.email}
                 </ThemedText>
@@ -392,12 +392,12 @@ export default function ContactDetailsScreen() {
                   style={[styles.channelItem, { backgroundColor: theme.backgroundElement }]}
                   activeOpacity={0.7}>
                   <View style={[styles.channelIconCircle, { backgroundColor: '#DCFCE7' }]}>
-                    <Ionicons name="logo-whatsapp" size={18} color="#16A34A" />
+                    <Ionicons name="logo-whatsapp" size={15} color="#16A34A" />
                   </View>
                   <ThemedText type="smallBold" style={styles.channelLabel}>
                     WhatsApp
                   </ThemedText>
-                  <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 11 }}>
+                  <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 10 }}>
                     Chat Direct
                   </ThemedText>
                 </TouchableOpacity>
@@ -415,12 +415,12 @@ export default function ContactDetailsScreen() {
                   style={[styles.channelItem, { backgroundColor: theme.backgroundElement }]}
                   activeOpacity={0.7}>
                   <View style={[styles.channelIconCircle, { backgroundColor: '#F3E8FF' }]}>
-                    <Ionicons name="chatbubble-ellipses" size={18} color="#9333EA" />
+                    <Ionicons name="chatbubble-ellipses" size={15} color="#9333EA" />
                   </View>
                   <ThemedText type="smallBold" style={styles.channelLabel}>
                     SMS
                   </ThemedText>
-                  <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 11 }}>
+                  <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 10 }}>
                     Send SMS
                   </ThemedText>
                 </TouchableOpacity>
@@ -436,13 +436,13 @@ export default function ContactDetailsScreen() {
             ]}>
             <View style={styles.cardHeaderRow}>
               <View style={styles.cardHeaderLeft}>
-                <Ionicons name="chatbox-ellipses-outline" size={18} color={theme.primary} />
+                <Ionicons name="chatbox-ellipses-outline" size={16} color={theme.primary} />
                 <ThemedText type="smallBold" style={styles.sectionHeaderTitle}>
                   Inquiry Message
                 </ThemedText>
               </View>
               <TouchableOpacity onPress={handleCopyMessage} activeOpacity={0.7}>
-                <Ionicons name="copy-outline" size={16} color={theme.textSecondary} />
+                <Ionicons name="copy-outline" size={15} color={theme.textSecondary} />
               </TouchableOpacity>
             </View>
 
@@ -464,7 +464,7 @@ export default function ContactDetailsScreen() {
               { backgroundColor: theme.card, borderColor: theme.cardBorder },
             ]}>
             <View style={styles.cardHeaderLeft}>
-              <Ionicons name="layers-outline" size={18} color={theme.primary} />
+              <Ionicons name="layers-outline" size={16} color={theme.primary} />
               <ThemedText type="smallBold" style={styles.sectionHeaderTitle}>
                 Service & Plan Specifications
               </ThemedText>
@@ -472,7 +472,7 @@ export default function ContactDetailsScreen() {
 
             <View style={styles.specGrid}>
               <View style={styles.specItem}>
-                <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 12 }}>
+                <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 11 }}>
                   Selected Plan
                 </ThemedText>
                 <ThemedText type="smallBold" style={styles.specValue}>
@@ -481,7 +481,7 @@ export default function ContactDetailsScreen() {
               </View>
 
               <View style={styles.specItem}>
-                <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 12 }}>
+                <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 11 }}>
                   Project Type
                 </ThemedText>
                 <ThemedText type="smallBold" style={styles.specValue}>
@@ -498,14 +498,14 @@ export default function ContactDetailsScreen() {
               { backgroundColor: theme.card, borderColor: theme.cardBorder },
             ]}>
             <View style={styles.cardHeaderLeft}>
-              <Ionicons name="information-circle-outline" size={18} color={theme.textSecondary} />
+              <Ionicons name="information-circle-outline" size={16} color={theme.textSecondary} />
               <ThemedText type="smallBold" style={styles.sectionHeaderTitle}>
                 Submission Information
               </ThemedText>
             </View>
 
             <View style={styles.metaRow}>
-              <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 12 }}>
+              <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 11 }}>
                 Inquiry ID:
               </ThemedText>
               <ThemedText type="code" style={{ fontSize: 11, color: theme.text }}>
@@ -514,19 +514,19 @@ export default function ContactDetailsScreen() {
             </View>
 
             <View style={styles.metaRow}>
-              <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 12 }}>
+              <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 11 }}>
                 Received At:
               </ThemedText>
-              <ThemedText type="small" style={{ fontSize: 12, color: theme.text }}>
+              <ThemedText type="small" style={{ fontSize: 11, color: theme.text }}>
                 {formatFullDateTime(contact.createdAt)}
               </ThemedText>
             </View>
 
             <View style={styles.metaRow}>
-              <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 12 }}>
+              <ThemedText type="small" style={{ color: theme.textSecondary, fontSize: 11 }}>
                 Last Modified:
               </ThemedText>
-              <ThemedText type="small" style={{ fontSize: 12, color: theme.text }}>
+              <ThemedText type="small" style={{ fontSize: 11, color: theme.text }}>
                 {formatFullDateTime(contact.updatedAt)}
               </ThemedText>
             </View>
@@ -549,10 +549,10 @@ export default function ContactDetailsScreen() {
                 <ActivityIndicator size="small" color={theme.danger} />
               ) : (
                 <>
-                  <Ionicons name="trash-outline" size={18} color={theme.danger} />
+                  <Ionicons name="trash-outline" size={16} color={theme.danger} />
                   <ThemedText
                     type="smallBold"
-                    style={{ color: theme.danger, marginLeft: 8, fontSize: 14 }}>
+                    style={{ color: theme.danger, marginLeft: 6, fontSize: 13 }}>
                     Delete Contact Inquiry
                   </ThemedText>
                 </>
@@ -569,18 +569,18 @@ const styles = StyleSheet.create({
   navActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.two,
+    gap: 6,
   },
   dangerSection: {
-    marginTop: Spacing.two,
-    marginBottom: Spacing.five,
+    marginTop: 2,
+    marginBottom: 20,
   },
   deleteContactBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
     borderWidth: 1,
   },
   container: {
@@ -596,167 +596,169 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderBottomWidth: 1,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
   },
   navTitle: {
-    fontSize: 16,
+    fontSize: 15,
   },
   scrollContent: {
-    padding: Spacing.four,
-    paddingBottom: Spacing.six,
-    gap: Spacing.three,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 24,
+    gap: 10,
   },
   profileCard: {
-    borderRadius: 16,
-    padding: Spacing.four,
+    borderRadius: 12,
+    padding: 14,
     borderWidth: 1,
   },
   profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.three,
+    marginBottom: 10,
   },
   avatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: Spacing.three,
+    marginRight: 10,
   },
   profileDetails: {
     flex: 1,
   },
   fullName: {
-    fontSize: 20,
-    lineHeight: 26,
-    fontWeight: '800',
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '700',
     marginBottom: 2,
   },
   statusBadgesRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.two,
+    gap: 6,
   },
   statusActionsCard: {
-    borderRadius: 16,
-    padding: Spacing.four,
+    borderRadius: 12,
+    padding: 14,
     borderWidth: 1,
   },
   sectionHeaderTitle: {
-    fontSize: 14,
-    marginBottom: 4,
+    fontSize: 13,
+    marginBottom: 2,
   },
   statusButtonsRow: {
     flexDirection: 'row',
-    gap: Spacing.two,
+    gap: 8,
   },
   statusActionBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 9,
     paddingHorizontal: 8,
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 1,
   },
   commCard: {
-    borderRadius: 16,
-    padding: Spacing.four,
+    borderRadius: 12,
+    padding: 14,
     borderWidth: 1,
   },
   channelGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.two,
+    gap: 8,
   },
   channelItem: {
     flex: 1,
-    minWidth: '45%',
-    padding: Spacing.three,
-    borderRadius: 12,
+    minWidth: '46%',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 10,
     alignItems: 'center',
   },
   channelIconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   channelLabel: {
-    fontSize: 13,
+    fontSize: 12,
     marginBottom: 2,
   },
   sectionCard: {
-    borderRadius: 16,
-    padding: Spacing.four,
+    borderRadius: 12,
+    padding: 14,
     borderWidth: 1,
   },
   cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: Spacing.two,
+    marginBottom: 6,
   },
   cardHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: Spacing.two,
+    marginBottom: 6,
   },
   messageBox: {
-    padding: Spacing.three,
-    borderRadius: 12,
+    padding: 10,
+    borderRadius: 10,
     borderWidth: 1,
   },
   messageText: {
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 20,
   },
   specGrid: {
     flexDirection: 'row',
-    gap: Spacing.three,
+    gap: 10,
   },
   specItem: {
     flex: 1,
   },
   specValue: {
-    fontSize: 15,
-    marginTop: 4,
+    fontSize: 13,
+    marginTop: 2,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 4,
+    paddingVertical: 3,
   },
   notFoundContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: Spacing.four,
+    padding: 16,
   },
   notFoundTitle: {
-    fontSize: 20,
-    marginTop: Spacing.two,
-    marginBottom: Spacing.one,
+    fontSize: 18,
+    marginTop: 8,
+    marginBottom: 4,
   },
   returnBtn: {
-    marginTop: Spacing.four,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 24,
+    marginTop: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
   },
 });

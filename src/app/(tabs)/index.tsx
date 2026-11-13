@@ -19,7 +19,7 @@ import { ContactCard } from '@/components/contact-card';
 import { FilterBar } from '@/components/filter-bar';
 import { AnalyticsSummary } from '@/components/analytics-summary';
 import { SearchBar } from '@/components/search-bar';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { BottomTabInset, MaxContentWidth } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function ContactsScreen() {
@@ -120,7 +120,7 @@ export default function ContactsScreen() {
             onPress={() => refreshContacts()}
             style={[styles.refreshIconBtn, { backgroundColor: theme.backgroundElement }]}
             activeOpacity={0.7}>
-            <Ionicons name="refresh" size={18} color={theme.text} />
+            <Ionicons name="refresh" size={16} color={theme.text} />
           </TouchableOpacity>
         </View>
 
@@ -208,7 +208,7 @@ export default function ContactsScreen() {
           ListEmptyComponent={renderEmptyList}
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: BottomTabInset + Spacing.six },
+            { paddingBottom: BottomTabInset + 24 },
           ]}
           refreshControl={
             <RefreshControl
@@ -216,6 +216,7 @@ export default function ContactsScreen() {
               onRefresh={refreshContacts}
               tintColor={theme.primary}
               colors={[theme.primary]}
+              progressBackgroundColor={theme.card}
             />
           }
           showsVerticalScrollIndicator={false}
@@ -242,19 +243,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    paddingTop: Platform.OS === 'android' ? Spacing.two : Spacing.one,
-    paddingBottom: Spacing.two,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'android' ? 8 : 4,
+    paddingBottom: 6,
   },
   screenTitle: {
-    fontSize: 26,
-    lineHeight: 32,
-    fontWeight: '800',
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: '700',
   },
   refreshIconBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -262,45 +263,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    marginBottom: Spacing.two,
+    paddingHorizontal: 16,
+    marginBottom: 6,
   },
   cardWrapper: {
-    paddingHorizontal: Spacing.four,
+    paddingHorizontal: 16,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: Spacing.six,
-    paddingHorizontal: Spacing.four,
+    paddingVertical: 32,
+    paddingHorizontal: 16,
   },
   emptyIconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Spacing.three,
+    marginBottom: 12,
   },
   emptyTitle: {
-    fontSize: 17,
+    fontSize: 16,
     marginBottom: 4,
   },
   emptySubtitle: {
     textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: Spacing.four,
+    lineHeight: 18,
+    marginBottom: 16,
   },
   resetFilterBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 16,
   },
   errorBanner: {
-    marginHorizontal: Spacing.four,
-    marginBottom: Spacing.two,
-    padding: Spacing.three,
-    borderRadius: 12,
+    marginHorizontal: 16,
+    marginBottom: 6,
+    padding: 10,
+    borderRadius: 10,
     borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -314,8 +315,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   retryBtn: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     borderRadius: 6,
   },
 });

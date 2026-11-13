@@ -3,7 +3,6 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ContactFilter, ContactsAnalytics } from '@/types';
 import { ThemedText } from './themed-text';
 import { useTheme } from '@/hooks/use-theme';
-import { Spacing } from '@/constants/theme';
 
 interface FilterBarProps {
   currentFilter: ContactFilter;
@@ -97,33 +96,33 @@ export function FilterBar({ currentFilter, onSelectFilter, analytics }: FilterBa
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: Spacing.two,
+    marginVertical: 4,
   },
   scrollContent: {
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.two,
+    paddingHorizontal: 16,
+    gap: 6,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+    borderRadius: 16,
     borderWidth: 1,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
   },
   countBadge: {
-    marginLeft: 6,
-    paddingHorizontal: 6,
+    marginLeft: 5,
+    paddingHorizontal: 5,
     paddingVertical: 1,
-    borderRadius: 10,
-    minWidth: 18,
+    borderRadius: 8,
+    minWidth: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   countText: {
-    fontSize: 11,
+    fontSize: 10,
   },
 });
