@@ -13,8 +13,22 @@ const fileName = 'app-arm64-v8a-release.apk';
 const sourcePath = path.join(androidDir, 'app', 'build', 'outputs', 'apk', 'release', fileName);
 const destPath = path.join(projectDir, fileName);
 
+// Parse API URL from CLI args (e.g., `node build.js https://api.example.com` or `--api-url=https://...`)
+const args = process.argv.slice(2);
+const cliApiUrl = args.find(arg => arg.startsWith('--api-url='))?.split('=')[1]
+    || args.find(arg => !arg.startsWith('--'));
+
+if (cliApiUrl) {
+    process.env.EXPO_PUBLIC_API_URL = cliApiUrl;
+}
+
 try {
     console.log('🚀 Starting Build Process...');
+    if (process.env.EXPO_PUBLIC_API_URL) {
+        console.log(`🌐 API Base URL (EXPO_PUBLIC_API_URL): ${process.env.EXPO_PUBLIC_API_URL}`);
+    } else {
+        console.log('ℹ️ No EXPO_PUBLIC_API_URL provided. Using default fallback in code.');
+    }
 
     // 1. Remove existing android directory and Run Expo Prebuild
     if (fs.existsSync(androidDir)) {
