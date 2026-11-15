@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
-  Platform,
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
@@ -9,18 +8,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
 import { useInbox } from '@/context/inbox-context';
 import { Contact, ContactFilter } from '@/types';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { ContactCard } from '@/components/contact-card';
-import { FilterBar } from '@/components/filter-bar';
-import { AnalyticsSummary } from '@/components/analytics-summary';
-import { SearchBar } from '@/components/search-bar';
+import { ThemedText } from '@/components/common/themed-text';
+import { ThemedView } from '@/components/common/themed-view';
+import { SearchBar } from '@/components/common/search-bar';
+import { EmptyState } from '@/components/common/empty-state';
+import { ErrorBanner } from '@/components/common/error-banner';
+import { ContactCard, ContactHeader, FilterBar } from '@/components/contacts';
 import { BottomTabInset, MaxContentWidth } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+
+const keyExtractor = (item: Contact) => item._id;
 
 export default function ContactsScreen() {
   const theme = useTheme();
@@ -65,96 +65,65 @@ export default function ContactsScreen() {
     });
   }, [contacts, currentFilter, searchQuery]);
 
-  const handleOpenDetails = (contact: Contact) => {
-    // Navigate to single contact details page
+  const handleOpenDetails = useCallback((contact: Contact) => {
     router.push({
       pathname: '/contact/[id]',
       params: { id: contact._id },
     });
-  };
+  }, []);
 
-  const renderEmptyList = () => (
-    <View style={styles.emptyContainer}>
-      <View style={[styles.emptyIconCircle, { backgroundColor: theme.backgroundElement }]}>
-        <Ionicons name="file-tray-outline" size={38} color={theme.textSecondary} />
+  const handleResetFilters = useCallback(() => {
+    setCurrentFilter('all');
+    setSearchQuery('');
+  }, []);
+
+  const renderEmptyList = useCallback(
+    () => (
+      <EmptyState
+        icon="file-tray-outline"
+        title="No inquiries found"
+        subtitle={
+          searchQuery
+            ? `No results matching "${searchQuery}"`
+            : `No contact inquiries found under "${currentFilter.replace('_', ' ')}" filter.`
+        }
+        actionLabel={
+          currentFilter !== 'all' || searchQuery.length > 0 ? 'Show All Inquiries' : undefined
+        }
+        onAction={handleResetFilters}
+      />
+    ),
+    [currentFilter, searchQuery, handleResetFilters]
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: Contact }) => (
+      <View style={styles.cardWrapper}>
+        <ContactCard
+          contact={item}
+          onPress={() => handleOpenDetails(item)}
+          onToggleRead={() => markAsRead(item._id)}
+          onToggleReplied={() => markAsReplied(item._id)}
+          isUpdatingRead={!!updatingReadIds[item._id]}
+          isUpdatingReplied={!!updatingRepliedIds[item._id]}
+        />
       </View>
-      <ThemedText type="smallBold" style={[styles.emptyTitle, { color: theme.text }]}>
-        No inquiries found
-      </ThemedText>
-      <ThemedText type="small" style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-        {searchQuery
-          ? `No results matching "${searchQuery}"`
-          : `No contact inquiries found under "${currentFilter.replace('_', ' ')}" filter.`}
-      </ThemedText>
-      {(currentFilter !== 'all' || searchQuery.length > 0) && (
-        <TouchableOpacity
-          onPress={() => {
-            setCurrentFilter('all');
-            setSearchQuery('');
-          }}
-          style={[styles.resetFilterBtn, { backgroundColor: theme.primary }]}
-          activeOpacity={0.8}>
-          <ThemedText type="small" style={{ color: theme.primaryText, fontWeight: '700' }}>
-            Show All Inquiries
-          </ThemedText>
-        </TouchableOpacity>
-      )}
-    </View>
+    ),
+    [handleOpenDetails, markAsRead, markAsReplied, updatingReadIds, updatingRepliedIds]
   );
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         {/* Top Header */}
-        <View style={styles.topHeader}>
-          <View>
-            <ThemedText type="subtitle" style={styles.screenTitle}>
-              Contacts Inbox
-            </ThemedText>
-            <ThemedText type="small" style={{ color: theme.textSecondary }}>
-              {contacts.length} total contact submissions
-            </ThemedText>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => refreshContacts()}
-            style={[styles.refreshIconBtn, { backgroundColor: theme.backgroundElement }]}
-            activeOpacity={0.7}>
-            <Ionicons name="refresh" size={16} color={theme.text} />
-          </TouchableOpacity>
-        </View>
+        <ContactHeader totalCount={contacts.length} onRefresh={refreshContacts} />
 
         {/* Server error notice if API fails */}
         {contactsError ? (
-          <View
-            style={[
-              styles.errorBanner,
-              { backgroundColor: theme.dangerMuted, borderColor: theme.danger },
-            ]}>
-            <View style={styles.errorTextRow}>
-              <Ionicons name="alert-circle" size={16} color={theme.danger} />
-              <ThemedText type="small" style={{ color: theme.danger, flex: 1, fontWeight: '600' }}>
-                {contactsError}
-              </ThemedText>
-            </View>
-            <TouchableOpacity
-              onPress={refreshContacts}
-              style={[styles.retryBtn, { backgroundColor: theme.danger }]}
-              activeOpacity={0.7}>
-              <ThemedText type="small" style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 11 }}>
-                Retry
-              </ThemedText>
-            </TouchableOpacity>
-          </View>
+          <ErrorBanner error={contactsError} onRetry={refreshContacts} />
         ) : null}
 
-        {/* Analytics Summary */}
-        <AnalyticsSummary
-          analytics={contactsAnalytics}
-          onFilterPress={(filter) => setCurrentFilter(filter)}
-        />
-
-        {/* Search Input - Rendered outside FlatList to retain focus and keep keyboard open */}
+        {/* Search Input */}
         <SearchBar
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -176,11 +145,7 @@ export default function ContactsScreen() {
           </ThemedText>
 
           {currentFilter !== 'all' || searchQuery.length > 0 ? (
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentFilter('all');
-                setSearchQuery('');
-              }}>
+            <TouchableOpacity onPress={handleResetFilters}>
               <ThemedText type="small" style={{ color: theme.primary, fontWeight: '600' }}>
                 Reset filters
               </ThemedText>
@@ -190,21 +155,10 @@ export default function ContactsScreen() {
 
         <FlatList
           data={filteredContacts}
-          keyExtractor={(item) => item._id}
+          keyExtractor={keyExtractor}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          renderItem={({ item }) => (
-            <View style={styles.cardWrapper}>
-              <ContactCard
-                contact={item}
-                onPress={() => handleOpenDetails(item)}
-                onToggleRead={() => markAsRead(item._id)}
-                onToggleReplied={() => markAsReplied(item._id)}
-                isUpdatingRead={!!updatingReadIds[item._id]}
-                isUpdatingReplied={!!updatingRepliedIds[item._id]}
-              />
-            </View>
-          )}
+          renderItem={renderItem}
           ListEmptyComponent={renderEmptyList}
           contentContainerStyle={[
             styles.listContent,
@@ -239,26 +193,6 @@ const styles = StyleSheet.create({
   listContent: {
     flexGrow: 1,
   },
-  topHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'android' ? 8 : 4,
-    paddingBottom: 6,
-  },
-  screenTitle: {
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '700',
-  },
-  refreshIconBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   resultCountRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -268,55 +202,5 @@ const styles = StyleSheet.create({
   },
   cardWrapper: {
     paddingHorizontal: 16,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 16,
-  },
-  emptyIconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  emptySubtitle: {
-    textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: 16,
-  },
-  resetFilterBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-  },
-  errorBanner: {
-    marginHorizontal: 16,
-    marginBottom: 6,
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  errorTextRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flex: 1,
-  },
-  retryBtn: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
   },
 });

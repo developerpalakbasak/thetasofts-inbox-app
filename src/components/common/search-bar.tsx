@@ -3,14 +3,14 @@ import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/hooks/use-theme';
 
-interface SearchBarProps {
+export interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
   onClear?: () => void;
 }
 
-export function SearchBar({
+export const SearchBar = React.memo(function SearchBar({
   value,
   onChangeText,
   placeholder = 'Search by name, email, message...',
@@ -52,7 +52,7 @@ export function SearchBar({
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -76,3 +76,4 @@ const styles = StyleSheet.create({
     padding: 0,
   },
 });
+

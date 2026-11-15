@@ -8,8 +8,8 @@ import {
 } from 'expo-router/ui';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { ThemedText } from './themed-text';
-import { ThemedView } from './themed-view';
+import { ThemedText } from '@/components/common/themed-text';
+import { ThemedView } from '@/components/common/themed-view';
 
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 
@@ -90,3 +90,4 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.three,
   },
 });
+

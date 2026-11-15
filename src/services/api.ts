@@ -17,7 +17,7 @@ export const AUTH_TOKEN = 'e95a5dc562902ba747f11c0f90b02c19';
 
 const getBaseUrl = (): string => {
   if (process.env.EXPO_PUBLIC_API_URL) {
-    return process.env.EXPO_PUBLIC_API_URL;
+    return process.env.EXPO_PUBLIC_API_URL.trim().replace(/\/+$/, '');
   }
   if (Platform.OS === 'web') {
     return 'http://localhost:4000';

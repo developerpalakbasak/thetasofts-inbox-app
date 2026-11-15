@@ -1,56 +1,104 @@
-# Welcome to your Expo app 👋
+# ThetaSofts Inbox App 📬
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile application built with **React Native** and **Expo Router** to manage contact form inquiries and newsletter subscribers.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Quick Start
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Install Dependencies
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configure Environment Variables
 
-### Other setup steps
+The app uses `EXPO_PUBLIC_API_URL` to point to the backend server. 
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Create a `.env` (or `.env.local`) file in the project root:
 
-## Learn more
+```env
+# Demo / Production API Server
+EXPO_PUBLIC_API_URL=https://thetasofts-inbox.hutchinsonapac.com
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+> **Note:** If `EXPO_PUBLIC_API_URL` is omitted, the app will automatically attempt to connect to your local development machine IP on port `4000` (or `http://localhost:4000` when running on web).
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 3. Start the Development Server
 
-## Join the community
+#### Option A: Using `.env` / `.env.local`
+```bash
+npx expo start -c
+```
 
-Join our community of developers creating universal apps.
+#### Option B: Inline Environment Variable
+You can also supply the demo API URL directly in your terminal command:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+EXPO_PUBLIC_API_URL="https://thetasofts-inbox.hutchinsonapac.com" npx expo start -c
+```
+
+*(The `-c` flag ensures Metro clears its cache and immediately applies the environment variable).*
+
+---
+
+## 📱 Running on Devices / Simulators
+
+Once Expo CLI is running:
+
+- Press `a` or run `npm run android` to open on an Android emulator / connected device.
+- Press `i` or run `npm run ios` to open on an iOS simulator.
+- Press `w` or run `npm run web` to run on the web browser.
+- Scan the terminal QR code with the **Expo Go** app on your physical iOS or Android device.
+
+---
+
+## 🛠 Available Scripts
+
+| Command | Description |
+| :--- | :--- |
+| `npm start` | Starts the Expo development server (`expo start`) |
+| `npm run android` | Runs the app on Android |
+| `npm run ios` | Runs the app on iOS |
+| `npm run web` | Starts the app in a web browser |
+| `npm run lint` | Runs ESLint checks |
+| `npm run build:apk` | Runs the APK build script |
+
+---
+
+## 📂 Project Structure
+
+```text
+src/
+├── app/                  # Expo Router file-based routes
+│   ├── (tabs)/           # Main bottom-tab screens (Inbox, Subscribers)
+│   ├── contact/          # Contact detail view
+│   └── _layout.tsx       # Root navigation layout
+├── components/           # Reusable UI components
+├── constants/            # Design tokens, themes, colors
+├── context/              # React Context providers (Contacts, Subscribers)
+├── hooks/                # Custom React hooks
+├── services/             # API services & Axios client configuration
+│   └── api.ts            # Base URL resolution and API endpoints
+├── types/                # TypeScript interface definitions
+└── utils/                # Helper utilities and formatters
+```
+
+---
+
+## 🔗 API Integration
+
+The app connects to the following REST API endpoints:
+
+- **Contacts:**
+  - `GET /contacts` – Retrieve all contact submissions
+  - `GET /contacts/unread` – Retrieve unread submissions
+  - `GET /contacts/read` – Retrieve read submissions
+  - `PATCH /contacts/:id/read` – Mark inquiry as read
+  - `PATCH /contacts/:id/replyed` – Mark inquiry as replied
+  - `DELETE /contacts/:id` – Delete contact inquiry
+
+- **Subscribers:**
+  - `GET /subscribers` – Retrieve newsletter subscribers
+  - `DELETE /subscribers/:id` – Delete subscriber

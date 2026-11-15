@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from './themed-text';
 import { useTheme } from '@/hooks/use-theme';
 
-interface StatusBadgeProps {
+export interface StatusBadgeProps {
   type: 'read' | 'unread' | 'replied' | 'not_replied' | 'active' | 'inactive';
   size?: 'sm' | 'md';
 }
@@ -102,3 +102,4 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
 });
+

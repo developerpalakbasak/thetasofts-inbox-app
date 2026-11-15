@@ -19,7 +19,9 @@ const cliApiUrl = args.find(arg => arg.startsWith('--api-url='))?.split('=')[1]
     || args.find(arg => !arg.startsWith('--'));
 
 if (cliApiUrl) {
-    process.env.EXPO_PUBLIC_API_URL = cliApiUrl;
+    process.env.EXPO_PUBLIC_API_URL = cliApiUrl.trim().replace(/\/+$/, '');
+} else if (process.env.EXPO_PUBLIC_API_URL) {
+    process.env.EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL.trim().replace(/\/+$/, '');
 }
 
 try {

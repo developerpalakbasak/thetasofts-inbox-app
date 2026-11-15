@@ -1,6 +1,13 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Alert } from 'react-native';
-import { Contact, Subscriber, ContactsAnalytics, SubscribersAnalytics } from '@/types';
+import { Contact, ContactsAnalytics, Subscriber, SubscribersAnalytics } from '@/types';
 import { contactsApi, subscribersApi } from '@/services/api';
 
 interface InboxContextValue {
@@ -27,6 +34,14 @@ interface InboxContextValue {
 
 const InboxContext = createContext<InboxContextValue | null>(null);
 
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === 'object') {
+    const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
+    return errorObj.response?.data?.message || errorObj.message || fallback;
+  }
+  return fallback;
+}
+
 export function InboxProvider({ children }: { children: React.ReactNode }) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
@@ -34,7 +49,7 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
   const [isLoadingSubscribers, setIsLoadingSubscribers] = useState(true);
   const [contactsError, setContactsError] = useState<string | null>(null);
   const [subscribersError, setSubscribersError] = useState<string | null>(null);
-  
+
   const [updatingReadIds, setUpdatingReadIds] = useState<Record<string, boolean>>({});
   const [updatingRepliedIds, setUpdatingRepliedIds] = useState<Record<string, boolean>>({});
   const [deletingContactIds, setDeletingContactIds] = useState<Record<string, boolean>>({});
@@ -46,10 +61,9 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await contactsApi.getAllContacts();
       setContacts(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      console.warn('Failed to fetch contacts from API:', err?.message || err);
-      const msg = err?.response?.data?.message || err?.message || 'Error connecting to server';
-      setContactsError(msg);
+    } catch (err: unknown) {
+      console.warn('Failed to fetch contacts from API:', err);
+      setContactsError(getErrorMessage(err, 'Error connecting to server'));
     } finally {
       setIsLoadingContacts(false);
     }
@@ -61,10 +75,9 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await subscribersApi.getAllSubscribers();
       setSubscribers(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      console.warn('Failed to fetch subscribers from API:', err?.message || err);
-      const msg = err?.response?.data?.message || err?.message || 'Error connecting to server';
-      setSubscribersError(msg);
+    } catch (err: unknown) {
+      console.warn('Failed to fetch subscribers from API:', err);
+      setSubscribersError(getErrorMessage(err, 'Error connecting to server'));
     } finally {
       setIsLoadingSubscribers(false);
     }
@@ -84,81 +97,71 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
     await fetchSubscribersData();
   }, [fetchSubscribersData]);
 
-  const markAsRead = useCallback(
-    async (id: string): Promise<boolean> => {
-      setUpdatingReadIds((prev) => ({ ...prev, [id]: true }));
+  const markAsRead = useCallback(async (id: string): Promise<boolean> => {
+    setUpdatingReadIds((prev) => ({ ...prev, [id]: true }));
+    try {
+      const updated = await contactsApi.markAsRead(id);
+      setContacts((prev) =>
+        prev.map((c) => (c._id === id ? { ...c, ...updated, isRead: true } : c))
+      );
+      return true;
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, 'Failed to mark as read');
+      Alert.alert('Update Failed', msg);
+      return false;
+    } finally {
+      setUpdatingReadIds((prev) => ({ ...prev, [id]: false }));
+    }
+  }, []);
 
-      try {
-        const updated = await contactsApi.markAsRead(id);
-        setContacts((prev) => prev.map((c) => (c._id === id ? { ...c, ...updated, isRead: true } : c)));
-        return true;
-      } catch (err: any) {
-        const msg = err?.response?.data?.message || err?.message || 'Failed to mark as read';
-        Alert.alert('Update Failed', msg);
-        return false;
-      } finally {
-        setUpdatingReadIds((prev) => ({ ...prev, [id]: false }));
-      }
-    },
-    []
-  );
+  const markAsReplied = useCallback(async (id: string): Promise<boolean> => {
+    setUpdatingRepliedIds((prev) => ({ ...prev, [id]: true }));
+    try {
+      const updated = await contactsApi.markAsReplied(id);
+      setContacts((prev) =>
+        prev.map((c) =>
+          c._id === id ? { ...c, ...updated, isReplyed: true, isRead: true } : c
+        )
+      );
+      return true;
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, 'Failed to mark as replied');
+      Alert.alert('Update Failed', msg);
+      return false;
+    } finally {
+      setUpdatingRepliedIds((prev) => ({ ...prev, [id]: false }));
+    }
+  }, []);
 
-  const markAsReplied = useCallback(
-    async (id: string): Promise<boolean> => {
-      setUpdatingRepliedIds((prev) => ({ ...prev, [id]: true }));
+  const deleteContact = useCallback(async (id: string): Promise<boolean> => {
+    setDeletingContactIds((prev) => ({ ...prev, [id]: true }));
+    try {
+      await contactsApi.deleteContact(id);
+      setContacts((prev) => prev.filter((c) => c._id !== id));
+      return true;
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, 'Failed to delete contact inquiry');
+      Alert.alert('Delete Failed', msg);
+      return false;
+    } finally {
+      setDeletingContactIds((prev) => ({ ...prev, [id]: false }));
+    }
+  }, []);
 
-      try {
-        const updated = await contactsApi.markAsReplied(id);
-        setContacts((prev) =>
-          prev.map((c) => (c._id === id ? { ...c, ...updated, isReplyed: true, isRead: true } : c))
-        );
-        return true;
-      } catch (err: any) {
-        const msg = err?.response?.data?.message || err?.message || 'Failed to mark as replied';
-        Alert.alert('Update Failed', msg);
-        return false;
-      } finally {
-        setUpdatingRepliedIds((prev) => ({ ...prev, [id]: false }));
-      }
-    },
-    []
-  );
-
-  const deleteContact = useCallback(
-    async (id: string): Promise<boolean> => {
-      setDeletingContactIds((prev) => ({ ...prev, [id]: true }));
-      try {
-        await contactsApi.deleteContact(id);
-        setContacts((prev) => prev.filter((c) => c._id !== id));
-        return true;
-      } catch (err: any) {
-        const msg = err?.response?.data?.message || err?.message || 'Failed to delete contact inquiry';
-        Alert.alert('Delete Failed', msg);
-        return false;
-      } finally {
-        setDeletingContactIds((prev) => ({ ...prev, [id]: false }));
-      }
-    },
-    []
-  );
-
-  const deleteSubscriber = useCallback(
-    async (idOrEmail: string): Promise<boolean> => {
-      setDeletingSubscriberIds((prev) => ({ ...prev, [idOrEmail]: true }));
-      try {
-        await subscribersApi.deleteSubscriber(idOrEmail);
-        setSubscribers((prev) => prev.filter((s) => s._id !== idOrEmail && s.email !== idOrEmail));
-        return true;
-      } catch (err: any) {
-        const msg = err?.response?.data?.message || err?.message || 'Failed to delete subscriber';
-        Alert.alert('Delete Failed', msg);
-        return false;
-      } finally {
-        setDeletingSubscriberIds((prev) => ({ ...prev, [idOrEmail]: false }));
-      }
-    },
-    []
-  );
+  const deleteSubscriber = useCallback(async (idOrEmail: string): Promise<boolean> => {
+    setDeletingSubscriberIds((prev) => ({ ...prev, [idOrEmail]: true }));
+    try {
+      await subscribersApi.deleteSubscriber(idOrEmail);
+      setSubscribers((prev) => prev.filter((s) => s._id !== idOrEmail && s.email !== idOrEmail));
+      return true;
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err, 'Failed to delete subscriber');
+      Alert.alert('Delete Failed', msg);
+      return false;
+    } finally {
+      setDeletingSubscriberIds((prev) => ({ ...prev, [idOrEmail]: false }));
+    }
+  }, []);
 
   const getContactById = useCallback(
     (id: string) => {
@@ -167,48 +170,93 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
     [contacts]
   );
 
+  // Optimized single-pass analytics computation
   const contactsAnalytics = useMemo<ContactsAnalytics>(() => {
-    const total = contacts.length;
-    const unread = contacts.filter((c) => !c.isRead).length;
-    const read = contacts.filter((c) => c.isRead).length;
-    const replyed = contacts.filter((c) => c.isReplyed).length;
-    const notReplyed = contacts.filter((c) => !c.isReplyed).length;
-    return { total, unread, read, replyed, notReplyed };
+    let unread = 0;
+    let read = 0;
+    let replyed = 0;
+    let notReplyed = 0;
+
+    for (let i = 0; i < contacts.length; i++) {
+      const c = contacts[i];
+      if (c.isRead) {
+        read++;
+      } else {
+        unread++;
+      }
+      if (c.isReplyed) {
+        replyed++;
+      } else {
+        notReplyed++;
+      }
+    }
+
+    return { total: contacts.length, unread, read, replyed, notReplyed };
   }, [contacts]);
 
+  // Optimized single-pass subscribers analytics computation
   const subscribersAnalytics = useMemo<SubscribersAnalytics>(() => {
-    const total = subscribers.length;
-    const active = subscribers.filter((s) => s.isActive).length;
-    const inactive = subscribers.filter((s) => !s.isActive).length;
-    return { total, active, inactive };
+    let active = 0;
+    let inactive = 0;
+
+    for (let i = 0; i < subscribers.length; i++) {
+      if (subscribers[i].isActive) {
+        active++;
+      } else {
+        inactive++;
+      }
+    }
+
+    return { total: subscribers.length, active, inactive };
   }, [subscribers]);
 
-  return (
-    <InboxContext.Provider
-      value={{
-        contacts,
-        subscribers,
-        isLoadingContacts,
-        isLoadingSubscribers,
-        contactsError,
-        subscribersError,
-        refreshContacts,
-        refreshSubscribers,
-        markAsRead,
-        markAsReplied,
-        deleteContact,
-        deleteSubscriber,
-        getContactById,
-        contactsAnalytics,
-        subscribersAnalytics,
-        updatingReadIds,
-        updatingRepliedIds,
-        deletingContactIds,
-        deletingSubscriberIds,
-      }}>
-      {children}
-    </InboxContext.Provider>
+  // Memoize context value to prevent unneeded consumer re-renders
+  const contextValue = useMemo<InboxContextValue>(
+    () => ({
+      contacts,
+      subscribers,
+      isLoadingContacts,
+      isLoadingSubscribers,
+      contactsError,
+      subscribersError,
+      refreshContacts,
+      refreshSubscribers,
+      markAsRead,
+      markAsReplied,
+      deleteContact,
+      deleteSubscriber,
+      getContactById,
+      contactsAnalytics,
+      subscribersAnalytics,
+      updatingReadIds,
+      updatingRepliedIds,
+      deletingContactIds,
+      deletingSubscriberIds,
+    }),
+    [
+      contacts,
+      subscribers,
+      isLoadingContacts,
+      isLoadingSubscribers,
+      contactsError,
+      subscribersError,
+      refreshContacts,
+      refreshSubscribers,
+      markAsRead,
+      markAsReplied,
+      deleteContact,
+      deleteSubscriber,
+      getContactById,
+      contactsAnalytics,
+      subscribersAnalytics,
+      updatingReadIds,
+      updatingRepliedIds,
+      deletingContactIds,
+      deletingSubscriberIds,
+    ]
   );
+
+  return <InboxContext.Provider value={contextValue}>{children}</InboxContext.Provider>;
 }
 
 export function useInbox() {

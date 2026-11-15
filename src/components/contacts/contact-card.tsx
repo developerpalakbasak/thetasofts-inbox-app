@@ -7,12 +7,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Contact } from '@/types';
-import { StatusBadge } from './status-badge';
-import { ThemedText } from './themed-text';
+import { StatusBadge } from '@/components/common/status-badge';
+import { ThemedText } from '@/components/common/themed-text';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDate, makePhoneCall, sendEmail } from '@/utils/contact-actions';
 
-interface ContactCardProps {
+export interface ContactCardProps {
   contact: Contact;
   onPress: () => void;
   onToggleRead?: () => void;
@@ -21,7 +21,7 @@ interface ContactCardProps {
   isUpdatingReplied?: boolean;
 }
 
-export function ContactCard({
+export const ContactCard = React.memo(function ContactCard({
   contact,
   onPress,
   onToggleRead,
@@ -249,7 +249,7 @@ export function ContactCard({
       </View>
     </TouchableOpacity>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -378,3 +378,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

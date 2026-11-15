@@ -1,10 +1,10 @@
 import React from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ContactFilter, ContactsAnalytics } from '@/types';
-import { ThemedText } from './themed-text';
+import { ThemedText } from '@/components/common/themed-text';
 import { useTheme } from '@/hooks/use-theme';
 
-interface FilterBarProps {
+export interface FilterBarProps {
   currentFilter: ContactFilter;
   onSelectFilter: (filter: ContactFilter) => void;
   analytics?: ContactsAnalytics;
@@ -19,12 +19,12 @@ interface FilterOption {
 const FILTER_OPTIONS: FilterOption[] = [
   { key: 'all', label: 'All', getCount: (s) => s.total },
   { key: 'unread', label: 'Unread', getCount: (s) => s.unread },
+  { key: 'not_replyed', label: 'Not Replied', getCount: (s) => s.notReplyed },
   { key: 'read', label: 'Read', getCount: (s) => s.read },
   { key: 'replyed', label: 'Replied', getCount: (s) => s.replyed },
-  { key: 'not_replyed', label: 'Not Replied', getCount: (s) => s.notReplyed },
 ];
 
-export function FilterBar({ currentFilter, onSelectFilter, analytics }: FilterBarProps) {
+export const FilterBar = React.memo(function FilterBar({ currentFilter, onSelectFilter, analytics }: FilterBarProps) {
   const theme = useTheme();
 
   return (
@@ -67,9 +67,9 @@ export function FilterBar({ currentFilter, onSelectFilter, analytics }: FilterBa
                     styles.countBadge,
                     {
                       backgroundColor: isSelected
-                        ? (theme.primary === '#000000'
-                            ? 'rgba(255, 255, 255, 0.25)'
-                            : 'rgba(0, 0, 0, 0.15)')
+                        ? theme.primary === '#000000'
+                          ? 'rgba(255, 255, 255, 0.25)'
+                          : 'rgba(0, 0, 0, 0.15)'
                         : theme.backgroundSelected,
                     },
                   ]}>
@@ -92,7 +92,7 @@ export function FilterBar({ currentFilter, onSelectFilter, analytics }: FilterBa
       </ScrollView>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -115,14 +115,18 @@ const styles = StyleSheet.create({
   },
   countBadge: {
     marginLeft: 5,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 8,
-    minWidth: 16,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 999,
+    paddingHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
   countText: {
     fontSize: 10,
+    lineHeight: 12,
+    textAlign: 'center',
+    includeFontPadding: false,
   },
 });
+

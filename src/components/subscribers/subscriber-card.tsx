@@ -1,52 +1,32 @@
-import React from 'react';
-import { ActivityIndicator, Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Subscriber } from '@/types';
-import { StatusBadge } from './status-badge';
-import { ThemedText } from './themed-text';
-import { useTheme } from '@/hooks/use-theme';
 import { useInbox } from '@/context/inbox-context';
+import { useTheme } from '@/hooks/use-theme';
+import { Subscriber } from '@/types';
 import { formatDate, sendEmail } from '@/utils/contact-actions';
+import { StatusBadge } from '@/components/common/status-badge';
+import { ThemedText } from '@/components/common/themed-text';
+import { ConfirmModal } from '@/components/common/confirm-modal';
+import { SubscriberOptionsModal } from './subscriber-options-modal';
 
-interface SubscriberCardProps {
+export interface SubscriberCardProps {
   subscriber: Subscriber;
 }
 
-export function SubscriberCard({ subscriber }: SubscriberCardProps) {
+export const SubscriberCard = React.memo(function SubscriberCard({ subscriber }: SubscriberCardProps) {
   const theme = useTheme();
-  const { deleteSubscriber, deletingSubscriberIds } = useInbox();
-  const isDeleting = deletingSubscriberIds[subscriber._id] || deletingSubscriberIds[subscriber.email] || false;
+  const { deleteSubscriber } = useInbox();
+  const [optionsVisible, setOptionsVisible] = useState(false);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
 
   const getInitial = (email: string) => {
     return (email[0] || 'S').toUpperCase();
   };
 
-  const confirmDeleteSubscriber = () => {
-    Alert.alert(
-      'Delete Subscriber?',
-      `Are you sure you want to remove "${subscriber.email}" from the subscriber list? This action cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            const success = await deleteSubscriber(subscriber._id || subscriber.email);
-            if (success) {
-              Alert.alert('Deleted', 'Subscriber removed successfully.');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleCopy = () => {
-    Alert.alert('Subscriber Options', subscriber.email, [
-      { text: 'Send Email', onPress: () => sendEmail(subscriber.email) },
-      { text: 'Delete Subscriber', style: 'destructive', onPress: confirmDeleteSubscriber },
-      { text: 'Close', style: 'cancel' },
-    ]);
+  const handleDeleteSubscriber = async () => {
+    setDeleteConfirmVisible(false);
+    await deleteSubscriber(subscriber._id || subscriber.email);
   };
 
   return (
@@ -106,54 +86,67 @@ export function SubscriberCard({ subscriber }: SubscriberCardProps) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={handleCopy}
+          onPress={() => setOptionsVisible(true)}
           style={[styles.actionBtn, { backgroundColor: theme.backgroundElement }]}
           activeOpacity={0.7}>
-          <Ionicons name="copy-outline" size={14} color={theme.text} />
+          <Ionicons name="settings" size={14} color={theme.text} />
           <ThemedText type="small" style={[styles.actionBtnText, { color: theme.text }]}>
             Options
           </ThemedText>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={confirmDeleteSubscriber}
-          disabled={isDeleting}
-          style={[styles.deleteBtn, { backgroundColor: theme.dangerMuted }]}
-          activeOpacity={0.7}>
-          {isDeleting ? (
-            <ActivityIndicator size="small" color={theme.danger} />
-          ) : (
-            <Ionicons name="trash-outline" size={15} color={theme.danger} />
-          )}
-        </TouchableOpacity>
       </View>
+
+      {/* Subscriber Options Modal */}
+      <SubscriberOptionsModal
+        visible={optionsVisible}
+        subscriber={subscriber}
+        onClose={() => setOptionsVisible(false)}
+        onSendEmail={() => {
+          setOptionsVisible(false);
+          sendEmail(subscriber.email);
+        }}
+        onDelete={() => {
+          setOptionsVisible(false);
+          setDeleteConfirmVisible(true);
+        }}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        visible={deleteConfirmVisible}
+        title="Delete Subscriber?"
+        message={`Are you sure you want to remove "${subscriber.email}" from your subscriber newsletter list?`}
+        confirmText="Delete"
+        isDestructive
+        onConfirm={handleDeleteSubscriber}
+        onClose={() => setDeleteConfirmVisible(false)}
+      />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
-    padding: 10,
-    marginBottom: 8,
     borderWidth: 1,
+    padding: 12,
+    marginBottom: 8,
   },
   contentRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    gap: 10,
+    marginBottom: 8,
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
   },
   details: {
     flex: 1,
-    marginRight: 8,
   },
   email: {
     fontSize: 13,
@@ -161,29 +154,22 @@ const styles = StyleSheet.create({
   },
   actionsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingTop: 6,
+    justifyContent: 'flex-end',
     borderTopWidth: 1,
+    paddingTop: 8,
+    gap: 8,
   },
   actionBtn: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
+    gap: 6,
     paddingVertical: 5,
-    borderRadius: 7,
-  },
-  deleteBtn: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 8,
   },
   actionBtnText: {
     fontSize: 11,
     fontWeight: '600',
   },
 });
+
